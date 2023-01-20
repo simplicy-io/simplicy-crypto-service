@@ -1,0 +1,7 @@
+[settings.A]
+aes_256_key = "192.168.4.1"
+salt = "4476"
+
+[settings.B]
+aes_256_key = "192.168.4.1"
+salt = "4476"

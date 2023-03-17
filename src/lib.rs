@@ -12,36 +12,25 @@ pub mod crypto_service {
     use crypto::buffer::{BufferResult, ReadBuffer, WriteBuffer};
     use crypto::{aes, blockmodes, buffer};
     use crate::config::ConfigService;
+    use rand::{thread_rng, Rng};
+    use rand::distributions::Alphanumeric;
 
-    #[derive(Clone, Debug)]
-    pub struct Aes256 {
-        key: [u8; 32]
-    }
+    #[derive(Clone, Debug, Default)]
+    pub struct Aes256 {}
 
     impl Aes256 {
-        
-        /// Creates a new `Aes256` struct with the given key.
-        ///
-        /// # Parameters
-        /// - `hashed_key`: The key hash to be used for encryption and decryption.
-        /// - `encoded_salt`: The encoded salt to be used for verifying key
-        /// # Returns
-        /// - `Aes256`: A new `Aes256` struct.
-        /// 
-        /// # Errors
-        /// - If the key hash is not verified, returns an error.
-        /// - If the encoded_salt does not match expected salt, returns an error
-        // pub fn new(hashed_key: &str, encoded_salt: &str) -> Self {
-        //     let settings: ConfigService = ConfigService::new().unwrap();
-        //     if settings.verify_key(hashed_key, encoded_salt).unwrap() {
-        //         return Err(anyhow!("Invalid input"));
-        //     }
-        //     const CUSTOM_ENGINE: engine::GeneralPurpose = engine::GeneralPurpose::new(&alphabet::URL_SAFE, general_purpose::NO_PAD);
-
-        //     let key_settings: &str= settings.get_aes_256_key();
-        //     let key: [u8; 32] = CUSTOM_ENGINE.decode(key_settings).unwrap().as_slice().try_into().unwrap();
-        //     Self { key }
-        // }
+        pub fn create_key(&self) -> Result<(String, String)> {
+            const CUSTOM_ENGINE: engine::GeneralPurpose = engine::GeneralPurpose::new(&alphabet::URL_SAFE, general_purpose::NO_PAD);
+    
+            let mut key: [u8; 32] = [0u8; 32];
+            let mut salt: [u8; 14] = [0u8; 14];
+            thread_rng().fill(&mut key[..]);
+            thread_rng().fill(&mut salt[..]);
+    
+            let encoded_key: String = CUSTOM_ENGINE.encode(&key);
+            let encoded_salt: String = CUSTOM_ENGINE.encode(&salt);
+            Ok((encoded_key, encoded_salt))
+        }
 
         /// Encrypts a buffer with the given key and nonce using
         /// AES-256/CBC/Pkcs encryption.

@@ -1,5 +1,3 @@
 /target
 /Cargo.lock
-Settings.toml
-Settings.test.toml
-Settings.*.test.toml
+.env
